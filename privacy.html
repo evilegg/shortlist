@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — Shortlist</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrapper">
+    <a class="nav-logo" href="/">Shortlist</a>
+    <ul class="nav-links">
+      <li><a href="/privacy">Privacy</a></li>
+      <li><a href="/terms">Terms</a></li>
+      <li><a href="/oauth">API Use</a></li>
+      <li><a href="https://github.com/evilegg/shortlist" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main>
+  <div class="wrapper">
+    <article class="prose">
+
+      <h1>Privacy Policy</h1>
+      <span class="last-updated">Last updated: March 2025</span>
+
+      <div class="callout">
+        <p><strong>Short version:</strong> Shortlist is self-hosted software.
+        All data stays on the server the operator controls.
+        No data is collected by, transmitted to, or stored by the Shortlist project or its maintainers.</p>
+      </div>
+
+      <h2>What Shortlist is</h2>
+      <p>
+        Shortlist is open-source, self-hosted software.
+        Each deployment is operated independently by a Discord server administrator (the "operator").
+        The Shortlist project and its maintainers do not operate any shared instance of the bot
+        and have no access to any operator's data.
+      </p>
+
+      <h2>Data the bot collects</h2>
+      <p>
+        When running in a Discord server, Shortlist observes messages in registered channels
+        and records the following data locally on the operator's server:
+      </p>
+      <ul>
+        <li>Discord user IDs and usernames of members who post YouTube links</li>
+        <li>Discord user IDs and usernames of members who react to those links</li>
+        <li>YouTube video URLs posted in watched channels</li>
+        <li>Emoji reaction events (which user reacted with which emoji to which message)</li>
+        <li>Computed scores derived from the above reactions</li>
+      </ul>
+      <p>
+        This data is stored in plain-text files (JSONL format) on the operator's own server.
+        It is not transmitted to any external service except the YouTube Data API
+        (see below) and Discord's own API (required for normal bot operation).
+      </p>
+
+      <h2>YouTube Data API use</h2>
+      <p>
+        Operators may optionally connect a YouTube account to allow Shortlist to create
+        and manage playlists on their behalf.
+        When this feature is enabled, Shortlist calls the YouTube Data API v3 to:
+      </p>
+      <ul>
+        <li>Create a new YouTube playlist on the operator's account</li>
+        <li>Insert ranked videos into that playlist</li>
+      </ul>
+      <p>
+        End users (Discord server members) never authenticate with Google.
+        Only the operator authenticates, and only their YouTube account is accessed.
+        See the <a href="/oauth">API Use</a> page for full details on OAuth scope usage.
+      </p>
+
+      <h2>Data retention and deletion</h2>
+      <p>
+        Because all data is stored locally by the operator, retention and deletion are
+        entirely under the operator's control.
+        To delete all collected data, the operator can remove the bot's data directory.
+        The Shortlist project has no ability to delete data on behalf of any operator.
+      </p>
+
+      <h2>Data sharing</h2>
+      <p>
+        The Shortlist project does not sell, share, or transfer any user data to third parties.
+        No analytics, telemetry, or crash-reporting systems are included in the software.
+      </p>
+
+      <h2>Discord</h2>
+      <p>
+        Shortlist operates as a Discord bot and therefore interacts with Discord's API.
+        Discord's own privacy practices are governed by
+        <a href="https://discord.com/privacy" target="_blank" rel="noopener">Discord's Privacy Policy</a>.
+      </p>
+
+      <h2>Contact</h2>
+      <p>
+        Questions about this policy or about a specific deployment of Shortlist should be
+        directed to the operator of that deployment.
+        Questions about the Shortlist software project can be raised as a
+        <a href="https://github.com/evilegg/shortlist/issues" target="_blank" rel="noopener">GitHub Issue</a>.
+      </p>
+
+    </article>
+  </div>
+</main>
+
+<footer>
+  <div class="wrapper">
+    <span>Shortlist by <a href="https://github.com/evilegg" target="_blank" rel="noopener">evilegg</a></span>
+    <nav class="footer-links">
+      <a href="/privacy">Privacy</a>
+      <a href="/terms">Terms</a>
+      <a href="/oauth">API Use</a>
+    </nav>
+  </div>
+</footer>
+
+</body>
+</html>
