@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube API Use — Shortlist</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrapper">
+    <a class="nav-logo" href="/">Shortlist</a>
+    <ul class="nav-links">
+      <li><a href="/privacy">Privacy</a></li>
+      <li><a href="/terms">Terms</a></li>
+      <li><a href="/oauth">API Use</a></li>
+      <li><a href="https://github.com/evilegg/shortlist" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main>
+  <div class="wrapper">
+    <article class="prose">
+
+      <h1>YouTube API Use</h1>
+      <span class="last-updated">This page is written for Google API quota reviewers and describes
+      exactly how Shortlist uses the YouTube Data API v3.</span>
+
+      <div class="callout">
+        <p><strong>Summary:</strong> Shortlist uses one OAuth scope
+        (<code>https://www.googleapis.com/auth/youtube</code>) to create playlists
+        and insert videos on behalf of the server operator's YouTube account.
+        End users (Discord server members) never authenticate with Google.
+        All API calls are operator-initiated, not automated.</p>
+      </div>
+
+      <h2>What Shortlist does</h2>
+      <p>
+        Shortlist is a Discord bot that collects YouTube links shared by members of a
+        Discord server, scores them based on emoji reactions (👍 👎 ❤️ 🔥 💀 etc.),
+        and optionally exports the highest-scored links as a ranked YouTube playlist.
+      </p>
+      <p>
+        The YouTube export feature is optional and operator-controlled.
+        It is triggered manually by a server administrator running a Discord slash
+        command (<code>/drunktank admin-only export</code>).
+        The bot then calls the YouTube Data API to create a playlist and insert
+        the ranked videos.
+      </p>
+
+      <h2>OAuth scope requested</h2>
+      <p>Shortlist requests one OAuth scope:</p>
+      <ul>
+        <li><code>https://www.googleapis.com/auth/youtube</code></li>
+      </ul>
+      <p>
+        This scope grants read and write access to the authenticated user's YouTube account.
+        It is required because creating a playlist and inserting videos are write operations
+        that cannot be performed with a narrower scope such as
+        <code>youtube.readonly</code> or <code>youtube.force-ssl</code> alone.
+      </p>
+      <p>
+        Shortlist uses this scope only for the following two API operations:
+      </p>
+      <ul>
+        <li><strong>Create a playlist</strong> — <code>playlists.insert</code> — creates a new playlist
+            on the operator's YouTube channel with a title and description derived from the
+            Discord channel being exported.</li>
+        <li><strong>Insert videos into the playlist</strong> — <code>playlistItems.insert</code> — adds
+            each ranked video to the playlist in score order, one API call per video.</li>
+      </ul>
+      <p>
+        No other YouTube API methods are called. Shortlist does not read, modify, or delete
+        any YouTube content other than what it creates.
+      </p>
+
+      <h2>Who authenticates</h2>
+      <p>
+        Only the <strong>bot operator</strong> (the Discord server administrator who installed
+        and configured Shortlist) authenticates with Google OAuth.
+        This is a one-time setup step performed using a helper script
+        (<code>node scripts/get-youtube-token.js</code>) that opens a browser authorization
+        page, and the resulting refresh token is stored in the operator's own
+        environment configuration.
+      </p>
+      <p>
+        <strong>End users — Discord server members who share links and react to videos — never
+        authenticate with Google and never interact with any Google service through Shortlist.</strong>
+        Their only interaction is through Discord's emoji reaction system.
+      </p>
+
+      <h2>Full user flow</h2>
+      <ol>
+        <li>A Discord server member posts a YouTube link in a watched channel.</li>
+        <li>Other members react to the message with emoji (👍, 👎, ❤️, 🔥, 💀, etc.).</li>
+        <li>Shortlist records the link and reaction events locally on the operator's server.
+            No YouTube API calls are made at this stage.</li>
+        <li>When the operator runs <code>/drunktank admin-only export</code>, Shortlist
+            reads the locally-stored scores, sorts the videos by score descending,
+            and calls the YouTube Data API to:
+          <ul>
+            <li>Create a new playlist on the operator's YouTube account</li>
+            <li>Insert each video into the playlist in ranked order</li>
+          </ul>
+        </li>
+        <li>The operator receives a link to the newly created playlist in their Discord DMs.</li>
+      </ol>
+
+      <h2>API call volume</h2>
+      <p>
+        API calls are made only when the operator explicitly triggers an export.
+        Exports are expected to occur at most weekly for a typical deployment.
+        Each export makes:
+      </p>
+      <ul>
+        <li>1 call to <code>playlists.insert</code></li>
+        <li>1 call to <code>playlistItems.insert</code> per video exported (typically 10–50 videos)</li>
+      </ul>
+      <p>
+        Estimated maximum: <strong>51 API calls per export</strong>, with exports
+        occurring at most once per week.
+        There is no background polling, no scheduled API calls, and no rate-sensitive
+        operations. The bot does not call the YouTube API at startup or on a recurring timer.
+      </p>
+
+      <h2>Data handling</h2>
+      <p>
+        The OAuth refresh token is stored in the operator's environment configuration
+        (a <code>.env</code> file on their server) and is never transmitted to the
+        Shortlist project or any third party.
+        Access tokens are obtained from Google's token endpoint at export time and
+        are used immediately; they are not persisted to disk.
+      </p>
+      <p>
+        Shortlist does not store, log, or transmit any YouTube account data beyond
+        the playlist ID returned by <code>playlists.insert</code>,
+        which is saved locally to allow the operator to update the same playlist
+        on subsequent exports.
+      </p>
+
+      <h2>Compliance</h2>
+      <p>
+        Shortlist's YouTube API use complies with the
+        <a href="https://developers.google.com/youtube/terms/api-services-terms-of-service" target="_blank" rel="noopener">YouTube API Services Terms of Service</a>
+        and the
+        <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Privacy Policy</a>.
+        Operators are required to accept these terms as a condition of enabling the
+        YouTube export feature (see <a href="/terms">Terms of Service</a>).
+      </p>
+
+      <h2>Questions</h2>
+      <p>
+        Questions about this page or Shortlist's API usage can be raised as a
+        <a href="https://github.com/evilegg/shortlist/issues" target="_blank" rel="noopener">GitHub Issue</a>.
+      </p>
+
+    </article>
+  </div>
+</main>
+
+<footer>
+  <div class="wrapper">
+    <span>Shortlist by <a href="https://github.com/evilegg" target="_blank" rel="noopener">evilegg</a></span>
+    <nav class="footer-links">
+      <a href="/privacy">Privacy</a>
+      <a href="/terms">Terms</a>
+      <a href="/oauth">API Use</a>
+    </nav>
+  </div>
+</footer>
+
+</body>
+</html>
