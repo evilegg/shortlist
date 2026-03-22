@@ -77,6 +77,18 @@ main { flex: 1; }
   text-align: center;
 }
 
+.hero-avatar {
+  width: 148px;
+  height: 148px;
+  image-rendering: pixelated;
+  border-radius: 18px;
+  display: block;
+  margin: 0 auto 2rem;
+  box-shadow:
+    0 0 0 1px var(--border),
+    0 0 32px rgba(79, 110, 247, 0.18);
+}
+
 .hero h1 {
   font-size: clamp(2rem, 5vw, 2.8rem);
   font-weight: 800;
